@@ -3,11 +3,11 @@ import ApplicationServices
 import MissionControlLabelsCore
 import os
 
-/// 상태 전환과 수집 주기를 담당한다. 수집은 직렬 큐에서, 표시는 메인 스레드에서 수행한다.
+/// 상태 전환·수집 주기 담당. 수집은 직렬 큐, 표시는 메인 스레드에서 수행
 final class LabelEngine {
     enum State: String { case inactive, idle, settling, showing }
 
-    /// 초기 실험값. 측정 결과로 조정.
+    /// 초기 실험값. 측정 결과로 조정
     static let idleInterval: TimeInterval = 0.25
     static let openInterval: TimeInterval = 0.08
     static let noPermissionInterval: TimeInterval = 1.0
@@ -140,7 +140,7 @@ final class LabelEngine {
                 }
             }
         } else if renderedSnapshot != nil {
-            // 배치가 바뀌었다(Space 이동, 창 재배치). 즉시 숨기고 다시 안정될 때까지 기다린다.
+            // 배치 변경(Space 이동, 창 재배치). 즉시 숨기고 재안정까지 대기
             renderedSnapshot = nil
             DispatchQueue.main.async { self.overlay.hide() }
             setState(.settling)

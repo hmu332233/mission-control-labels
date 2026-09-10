@@ -45,7 +45,7 @@ enum AX {
         return s
     }
 
-    /// AX 위치·크기 → 좌상단 원점 전역 사각형.
+    /// AX 위치·크기 → 좌상단 원점 전역 사각형
     static func frame(_ element: AXUIElement) -> CGRect? {
         guard let p = point(element, kAXPositionAttribute), let s = size(element, kAXSizeAttribute) else { return nil }
         return CGRect(origin: p, size: s)

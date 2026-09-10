@@ -1,7 +1,6 @@
 import AppKit
 import MissionControlLabelsCore
 
-/// 메뉴바 항목: 켜기·끄기, 권한 안내, 진단, 종료.
 final class StatusBarController: NSObject, NSMenuDelegate {
     private let item: NSStatusItem
     private let menu = NSMenu()
@@ -13,6 +12,9 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let anchorMenu = NSMenu()
     var anchor: LabelAnchor = .default
     var onAnchorChange: ((LabelAnchor) -> Void)?
+    private let orderMenu = NSMenu()
+    var order: LabelOrder = .default
+    var onOrderChange: ((LabelOrder) -> Void)?
     var isEnabled = true
     var isTrusted = false
     var stateText = ""
@@ -43,6 +45,15 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
         anchorItem.submenu = anchorMenu
         menu.addItem(anchorItem)
+        let orderItem = NSMenuItem(title: "정보 순서", action: nil, keyEquivalent: "")
+        for o in LabelOrder.allCases {
+            let mi = NSMenuItem(title: o.displayName, action: #selector(selectOrder(_:)), keyEquivalent: "")
+            mi.representedObject = o.rawValue
+            mi.target = self
+            orderMenu.addItem(mi)
+        }
+        orderItem.submenu = orderMenu
+        menu.addItem(orderItem)
         menu.addItem(.separator())
         menu.addItem(diagItem)
         menu.addItem(withTitle: "진단 로그 폴더 열기", action: #selector(openLogs), keyEquivalent: "").target = self
@@ -59,6 +70,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         permissionItem.title = isTrusted ? "손쉬운 사용 권한: 허용됨" : "손쉬운 사용 권한 필요 — 시스템 설정 열기…"
         stateItem.title = "상태: \(stateText)"
         for mi in anchorMenu.items { mi.state = (mi.representedObject as? String) == anchor.rawValue ? .on : .off }
+        for mi in orderMenu.items { mi.state = (mi.representedObject as? String) == order.rawValue ? .on : .off }
         item.button?.appearsDisabled = !(isEnabled && isTrusted)
     }
 
@@ -81,6 +93,13 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         anchor = a
         refresh()
         onAnchorChange?(a)
+    }
+
+    @objc private func selectOrder(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let o = LabelOrder(rawValue: raw) else { return }
+        order = o
+        refresh()
+        onOrderChange?(o)
     }
 
     @objc private func armDiagnostics() { onArmDiagnostics?() }

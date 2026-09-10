@@ -1,12 +1,12 @@
 import Foundation
 import CoreGraphics
 
-/// 썸네일 좌표와 CG 창 좌표를 대응시킨다. 모호하면 대응을 거부한다.
+/// 썸네일 좌표와 CG 창 좌표 대응. 모호 시 대응 거부
 public struct GeometryMatcher: Sendable {
     public struct Config: Sendable {
-        /// 중심점 거리 허용 오차(pt).
+        /// 중심점 거리 허용 오차(pt)
         public var centerTolerance: CGFloat
-        /// 폭·높이 각각의 허용 오차(pt).
+        /// 폭·높이 각각의 허용 오차(pt)
         public var sizeTolerance: CGFloat
         public init(centerTolerance: CGFloat = 4, sizeTolerance: CGFloat = 4) {
             self.centerTolerance = centerTolerance
@@ -44,9 +44,9 @@ public struct GeometryMatcher: Sendable {
     }
 }
 
-/// 썸네일 제목(생략 가능)과 앱 AX 창 제목 목록에서 원래 제목을 유일하게 찾는다.
+/// 썸네일 제목(생략 가능)과 앱 AX 창 제목 목록에서 원래 제목 유일 탐색
 public enum TitleMatcher {
-    /// 후보 중 정확히 하나만 일치하면 그 인덱스를 돌려준다. 0개 또는 2개 이상이면 nil.
+    /// 후보 중 정확히 1개만 일치하면 해당 인덱스 반환. 0개 또는 2개 이상이면 nil
     public static func uniqueIndex(thumbnailTitle raw: String, in candidates: [String]) -> Int? {
         let t = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return nil }

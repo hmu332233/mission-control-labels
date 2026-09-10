@@ -16,7 +16,7 @@ final class GeometryTests: XCTestCase {
     }
 
     func testNegativeCoordinatesOnLeftScreen() {
-        // CG 좌표: 왼쪽 화면은 x가 음수. 위쪽 화면은 CG y가 음수.
+        // CG 좌표: 왼쪽 화면은 x 음수, 위쪽 화면은 CG y 음수
         let tl = CGRect(x: -1500, y: 300, width: 400, height: 200)
         let ak = geo.appKitRect(fromTopLeft: tl)
         XCTAssertEqual(ak.origin.y, 500)
@@ -122,6 +122,21 @@ final class LayoutAndSessionTests: XCTestCase {
                               title: "Welcome", confidence: .geometry).displayLines
         XCTAssertEqual(n.primary, "Welcome")
         XCTAssertEqual(n.secondary, "Code")
+    }
+
+    func testAppFirstOrderSwapsLines() {
+        let plain = ResolvedLabel(frame: .zero, appName: "A", title: "B", confidence: .geometry).displayLines(order: .appFirst)
+        XCTAssertEqual(plain.primary, "A")
+        XCTAssertEqual(plain.secondary, "B")
+        // 제목이 없거나 앱 이름과 같으면 순서와 무관하게 한 줄
+        let same = ResolvedLabel(frame: .zero, appName: "Safari", title: "Safari", confidence: .geometry).displayLines(order: .appFirst)
+        XCTAssertEqual(same.primary, "Safari")
+        XCTAssertNil(same.secondary)
+        // VS Code: 1줄 앱 이름, 2줄 "워크스페이스 · 파일"
+        let code = ResolvedLabel(frame: .zero, appName: "Code", bundleID: "com.microsoft.VSCode",
+                                 title: "LabelView.swift — mission-control-labels — Visual Studio Code", confidence: .geometry).displayLines(order: .appFirst)
+        XCTAssertEqual(code.primary, "Code")
+        XCTAssertEqual(code.secondary, "mission-control-labels · LabelView.swift")
     }
 
     func testStaleSessionResultIsDiscarded() {

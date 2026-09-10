@@ -1,29 +1,28 @@
 import AppKit
 import MissionControlLabelsCore
 
-/// 1줄 주 정보(창 제목·워크스페이스, 최대 2줄)와 2줄 보조 정보(앱 이름, 1줄)를 반투명 글래스 카드 위에 중앙 정렬로 그리는 라벨. 아이콘은 없다.
-/// 디자인 근거: design/spec.md 시안 A(카드). 배경은 뒤 화면을 따라가지 않는 고정 단색이다.
+/// 1줄 주 정보(창 제목·워크스페이스, 최대 2줄)와 2줄 보조 정보(앱 이름, 1줄)를 반투명 글래스 카드 위에 중앙 정렬로 그리는 라벨. 아이콘 없음
+/// 디자인 근거: design/spec.md 시안 A(카드). 배경은 뒤 화면과 무관한 고정 단색
 final class LabelView: NSView {
-    // 디자인 값. 실제 화면 확인 후 조정.
     static let appFont = NSFont.systemFont(ofSize: 15, weight: .semibold)
     static let titleFont = NSFont.systemFont(ofSize: 13, weight: .regular)
     static let appColor = NSColor.white
     static let titleColor = NSColor.white.withAlphaComponent(0.78)
-    /// 카드 배경. 블러·비침 없이 어디서나 같은 색으로 보이도록 거의 불투명한 어두운 회색을 쓴다.
+    /// 카드 배경. 블러·비침 없이 어디서나 동일 색으로 보이도록 거의 불투명한 어두운 회색 사용
     static let cardBackground = NSColor(calibratedRed: 0.11, green: 0.11, blue: 0.12, alpha: 0.92)
     static let border = NSColor.white.withAlphaComponent(0.18)
     static let paddingH: CGFloat = 16
     static let paddingV: CGFloat = 11
     static let lineGap: CGFloat = 3
     static let cornerRadius: CGFloat = 14
-    /// 카드 최대 폭. 큰 썸네일에서도 과하게 넓어지지 않게 한다.
+    /// 카드 최대 폭. 큰 썸네일에서도 과도한 확장 방지
     static let maxCardWidth: CGFloat = 400
 
     private let text: TextLayer
 
-    init(label: ResolvedLabel, maxWidth: CGFloat, titleLineLimit: Int, alignment: LabelAnchor.TextAlignment = .center) {
+    init(label: ResolvedLabel, maxWidth: CGFloat, titleLineLimit: Int, alignment: LabelAnchor.TextAlignment = .center, order: LabelOrder = .default) {
         let cardMax = min(maxWidth, Self.maxCardWidth)
-        text = TextLayer(label: label, textWidth: max(24, cardMax - Self.paddingH * 2), titleLineLimit: titleLineLimit, alignment: alignment)
+        text = TextLayer(label: label, textWidth: max(24, cardMax - Self.paddingH * 2), titleLineLimit: titleLineLimit, alignment: alignment, order: order)
         let size = NSSize(width: min(cardMax, text.contentSize.width + Self.paddingH * 2),
                           height: text.contentSize.height + Self.paddingV * 2)
         super.init(frame: NSRect(origin: .zero, size: size))
@@ -59,10 +58,9 @@ final class LabelView: NSView {
         return v
     }
 
-    /// 카드 가장자리의 1px 하이라이트 테두리.
     private final class BorderView: NSView {
         override func draw(_ dirtyRect: NSRect) {
-            // 물리 1px 테두리(Retina 2×에서 0.5pt).
+            // 물리 1px 테두리(Retina 2×에서 0.5pt)
             let scale = window?.backingScaleFactor ?? 2
             let w = 1 / scale
             let path = NSBezierPath(roundedRect: bounds.insetBy(dx: w / 2, dy: w / 2),
@@ -74,7 +72,7 @@ final class LabelView: NSView {
         override func hitTest(_ point: NSPoint) -> NSView? { nil }
     }
 
-    /// 텍스트 측정·그리기. 중앙 정렬, 마지막 줄 말줄임.
+    /// 텍스트 측정·그리기. 중앙 정렬, 마지막 줄 말줄임
     private final class TextLayer: NSView {
         let primary: String?
         let secondary: String?
@@ -83,17 +81,16 @@ final class LabelView: NSView {
         let contentSize: CGSize
         let alignment: NSTextAlignment
 
-        init(label: ResolvedLabel, textWidth: CGFloat, titleLineLimit: Int, alignment: LabelAnchor.TextAlignment) {
+        init(label: ResolvedLabel, textWidth: CGFloat, titleLineLimit: Int, alignment: LabelAnchor.TextAlignment, order: LabelOrder) {
             switch alignment {
             case .left: self.alignment = .left
             case .center: self.alignment = .center
             case .right: self.alignment = .right
             }
-            let lines = label.displayLines
+            let lines = label.displayLines(order: order)
             primary = lines.primary
             secondary = titleLineLimit > 0 ? lines.secondary : nil
             var pw: CGFloat = 0, ph: CGFloat = 0, sw: CGFloat = 0, sh: CGFloat = 0
-            // 주 정보(제목)는 최대 titleLineLimit줄, 보조 정보(앱 이름)는 1줄.
             if let p = primary {
                 let r = TextLayer.measure(p, width: textWidth, attrs: TextLayer.attrs(LabelView.appFont, LabelView.appColor), maxLines: max(1, titleLineLimit))
                 pw = r.width; ph = r.height

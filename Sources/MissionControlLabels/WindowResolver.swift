@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 import MissionControlLabelsCore
 
-/// 썸네일을 실제 창(CG)·앱(NSRunningApplication)·원래 제목(앱 AX 창)에 연결한다.
+/// 썸네일을 실제 창(CG)·앱(NSRunningApplication)·원래 제목(앱 AX 창)에 연결
 final class WindowResolver {
     struct AppWindowInfo {
         var title: String
@@ -14,14 +14,13 @@ final class WindowResolver {
     private var appNameCache: [pid_t: String] = [:]
     private var appWindowsCache: [pid_t: [AppWindowInfo]] = [:]
 
-    /// 최근 수집한 CG 창 목록(진단용).
     private(set) var lastWindows: [WindowRecord] = []
 
     init(excludedPIDs: Set<pid_t>) {
         self.excludedPIDs = excludedPIDs
     }
 
-    /// 세션이 바뀌거나 창 집합이 바뀌면 창 캐시를 버린다. 앱 이름 캐시는 프로세스 종료 시 정리한다.
+    /// 세션 또는 창 집합 변경 시 창 캐시 폐기. 앱 이름 캐시는 프로세스 종료 시 정리
     func invalidateSessionCaches() {
         appWindowsCache.removeAll()
         let running = Set(NSWorkspace.shared.runningApplications.map(\.processIdentifier))
@@ -75,7 +74,6 @@ final class WindowResolver {
     struct Outcome {
         var labels: [ResolvedLabel]
         var stats: ResolveStats
-        /// 진단용 대응 상세(썸네일 인덱스 → 후보 창 ID 목록).
         var detail: [(thumbnail: Thumbnail, result: GeometryMatcher.Result, label: ResolvedLabel)]
     }
 
@@ -112,7 +110,7 @@ final class WindowResolver {
         return Outcome(labels: labels, stats: stats, detail: detail.map { ($0.0, $0.1, $0.2) })
     }
 
-    /// 앱이 확정된 뒤, 그 앱의 AX 창 제목 중 유일하게 대응하는 원래 제목을 찾는다.
+    /// 앱 확정 후, 해당 앱의 AX 창 제목 중 유일하게 대응하는 원래 제목 탐색
     private func originalTitle(for thumbTitle: String, pid: pid_t) -> (String?, Bool) {
         let trimmed = thumbTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return (nil, false) }
@@ -123,7 +121,7 @@ final class WindowResolver {
         return (trimmed, false)
     }
 
-    /// 좌표 대응 실패 시: 화면에 있는 모든 앱의 AX 창 제목 중 정확히 하나만 일치하면 그 앱으로 확정.
+    /// 좌표 대응 실패 시: 화면에 있는 모든 앱의 AX 창 제목 중 정확히 1개만 일치하면 그 앱으로 확정
     private func fallbackByTitle(_ t: Thumbnail, windows: [WindowRecord], stats: inout ResolveStats) -> ResolvedLabel {
         let trimmed = t.title.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty {

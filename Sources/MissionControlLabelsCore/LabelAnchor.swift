@@ -1,13 +1,11 @@
 import Foundation
 import CoreGraphics
 
-/// 썸네일 안에서 라벨을 놓는 위치.
 public enum LabelAnchor: String, CaseIterable, Sendable {
     case center, topLeft, topRight, bottomLeft, bottomRight
 
     public static let `default`: LabelAnchor = .center
 
-    /// 메뉴 표시 이름(한국어).
     public var displayName: String {
         switch self {
         case .center: return "중앙"
@@ -20,7 +18,6 @@ public enum LabelAnchor: String, CaseIterable, Sendable {
 
     public enum TextAlignment: Sendable { case left, center, right }
 
-    /// 모서리에 붙을 때는 그쪽으로 텍스트를 정렬한다.
     public var textAlignment: TextAlignment {
         switch self {
         case .center: return .center
@@ -29,7 +26,7 @@ public enum LabelAnchor: String, CaseIterable, Sendable {
         }
     }
 
-    /// AppKit 좌표(y 위로 증가)의 썸네일 사각형 안에 크기 `size`의 라벨을 놓을 원점.
+    /// AppKit 좌표(y 위로 증가)의 썸네일 사각형 안에 크기 `size`의 라벨을 놓을 원점
     public func origin(labelSize size: CGSize, in thumb: CGRect, inset: CGFloat) -> CGPoint {
         let x: CGFloat, y: CGFloat
         switch self {

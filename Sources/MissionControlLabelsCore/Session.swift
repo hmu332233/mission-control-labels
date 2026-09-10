@@ -1,6 +1,6 @@
 import Foundation
 
-/// Mission Control이 열릴 때마다 증가하는 세션 번호. 늦게 도착한 결과를 폐기하는 데 쓴다.
+/// Mission Control이 열릴 때마다 증가하는 세션 번호. 지연 도착 결과 폐기에 사용
 public struct SessionToken: Equatable, Hashable, Sendable {
     public let id: UInt64
     public init(_ id: UInt64) { self.id = id }

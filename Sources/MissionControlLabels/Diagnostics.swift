@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 import MissionControlLabelsCore
 
-/// 개발 중 명시적으로 켠 경우에만 창 제목 등 상세 정보를 로컬 파일에 기록한다. 외부 전송 없음.
+/// 개발 중 명시적으로 켠 경우에 한해 창 제목 등 상세 정보를 로컬 파일에 기록. 외부 전송 없음
 final class Diagnostics {
     private let lock = NSLock()
     private var armed = false

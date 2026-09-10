@@ -1,0 +1,7 @@
+.build/
+build/
+*.xcodeproj
+.DS_Store
+
+# 개인 계획·메모 (저장소에 포함하지 않음)
+notes/

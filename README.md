@@ -60,6 +60,10 @@ To launch at login, move the app to `/Applications` and add it under **System Se
 - **No labels appear** — Check the permission status in the menu. After a rebuild, remove the app from the Accessibility list and add it again.
 - **Some windows show only the app name** — That app does not expose a window title. This is expected.
 
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=hmu332233/mission-control-labels)](https://github.com/hmu332233/mission-control-labels/graphs/contributors)
+
 ## License
 
 [MIT](LICENSE)

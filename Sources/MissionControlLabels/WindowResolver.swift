@@ -95,7 +95,7 @@ final class WindowResolver {
                 stats.uniqueMatches += 1
                 let (title, resolved) = originalTitle(for: t.title, pid: w.ownerPID)
                 if resolved { stats.originalTitleResolved += 1 }
-                label = ResolvedLabel(frame: t.frame, appName: appName(for: w.ownerPID), bundleID: bundleID(for: w.ownerPID), title: title, confidence: .geometry)
+                label = ResolvedLabel(frame: t.frame, appName: appName(for: w.ownerPID), bundleID: bundleID(for: w.ownerPID), ownerPID: w.ownerPID, title: title, confidence: .geometry)
             case .ambiguous:
                 stats.ambiguousMatches += 1
                 label = fallbackByTitle(t, windows: windows, stats: &stats)
@@ -131,7 +131,7 @@ final class WindowResolver {
             }
             if let i = TitleMatcher.uniqueIndex(thumbnailTitle: trimmed, in: all.map(\.title)) {
                 stats.titleUniqueFallbacks += 1
-                return ResolvedLabel(frame: t.frame, appName: appName(for: all[i].pid), bundleID: bundleID(for: all[i].pid), title: all[i].title, confidence: .titleUnique)
+                return ResolvedLabel(frame: t.frame, appName: appName(for: all[i].pid), bundleID: bundleID(for: all[i].pid), ownerPID: all[i].pid, title: all[i].title, confidence: .titleUnique)
             }
         }
         return ResolvedLabel(frame: t.frame, appName: nil, title: trimmed.isEmpty ? nil : trimmed, confidence: .thumbnailOnly)

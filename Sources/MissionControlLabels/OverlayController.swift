@@ -28,6 +28,7 @@ final class OverlayController {
     static let inset: CGFloat = 8
     static let anchorDefaultsKey = "labelAnchor"
     static let orderDefaultsKey = "labelOrder"
+    static let showAppIconDefaultsKey = "showAppIcon"
 
     var anchor: LabelAnchor = LabelAnchor(rawValue: UserDefaults.standard.string(forKey: OverlayController.anchorDefaultsKey) ?? "") ?? .default {
         didSet { UserDefaults.standard.set(anchor.rawValue, forKey: Self.anchorDefaultsKey) }
@@ -37,9 +38,15 @@ final class OverlayController {
         didSet { UserDefaults.standard.set(order.rawValue, forKey: Self.orderDefaultsKey) }
     }
 
+    /// 기본 꺼짐: design/spec.md 시안 A는 아이콘 없는 라벨을 기준으로 함
+    var showAppIcon: Bool = UserDefaults.standard.bool(forKey: OverlayController.showAppIconDefaultsKey) {
+        didSet { UserDefaults.standard.set(showAppIcon, forKey: Self.showAppIconDefaultsKey) }
+    }
+
     private var windows: [OverlayWindow] = []
     private var geometry = DisplayGeometry(primaryHeight: 0, screenFrames: [])
     private let sessions: SessionCounter
+    private let iconProvider = AppIconProvider()
     private(set) var isShowing = false
 
     init(sessions: SessionCounter) {
@@ -67,6 +74,7 @@ final class OverlayController {
     func show(_ labels: [ResolvedLabel], session: SessionToken) {
         guard sessions.isCurrent(session) else { return }
         refreshGeometry()
+        if showAppIcon { iconProvider.invalidateSessionCaches() }
         for w in windows { w.contentView?.subviews.forEach { $0.removeFromSuperview() } }
 
         for label in labels {
@@ -76,7 +84,8 @@ final class OverlayController {
             let local = geometry.localRect(thumbAppKit, inScreen: geometry.screenFrames[idx])
             let maxWidth = max(24, local.width - Self.inset * 2)
             let lineLimit = LabelLayoutPolicy.titleLineLimit(forThumbnailHeight: local.height)
-            let view = LabelView(label: label, maxWidth: maxWidth, titleLineLimit: lineLimit, alignment: anchor.textAlignment, order: order)
+            let icon = (showAppIcon ? label.ownerPID.flatMap(iconProvider.icon(for:)) : nil)
+            let view = LabelView(label: label, maxWidth: maxWidth, titleLineLimit: lineLimit, alignment: anchor.textAlignment, order: order, icon: icon)
             var size = view.frame.size
             size.height = min(size.height, max(0, local.height - Self.inset * 2))
             let origin = anchor.origin(labelSize: size, in: local, inset: Self.inset)

@@ -15,6 +15,9 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let orderMenu = NSMenu()
     var order: LabelOrder = .default
     var onOrderChange: ((LabelOrder) -> Void)?
+    private let showAppIconItem = NSMenuItem(title: "앱 아이콘 표시", action: #selector(toggleShowAppIcon), keyEquivalent: "")
+    var showAppIcon = false
+    var onShowAppIconChange: ((Bool) -> Void)?
     var isEnabled = true
     var isTrusted = false
     var stateText = ""
@@ -30,7 +33,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         } else {
             item.button?.title = "MC"
         }
-        for mi in [toggleItem, permissionItem, diagItem] { mi.target = self }
+        for mi in [toggleItem, permissionItem, diagItem, showAppIconItem] { mi.target = self }
         stateItem.isEnabled = false
         menu.addItem(toggleItem)
         menu.addItem(stateItem)
@@ -54,6 +57,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
         orderItem.submenu = orderMenu
         menu.addItem(orderItem)
+        menu.addItem(showAppIconItem)
         menu.addItem(.separator())
         menu.addItem(diagItem)
         menu.addItem(withTitle: "진단 로그 폴더 열기", action: #selector(openLogs), keyEquivalent: "").target = self
@@ -71,6 +75,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         stateItem.title = "상태: \(stateText)"
         for mi in anchorMenu.items { mi.state = (mi.representedObject as? String) == anchor.rawValue ? .on : .off }
         for mi in orderMenu.items { mi.state = (mi.representedObject as? String) == order.rawValue ? .on : .off }
+        showAppIconItem.state = showAppIcon ? .on : .off
         item.button?.appearsDisabled = !(isEnabled && isTrusted)
     }
 
@@ -100,6 +105,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         order = o
         refresh()
         onOrderChange?(o)
+    }
+
+    @objc private func toggleShowAppIcon() {
+        showAppIcon.toggle()
+        refresh()
+        onShowAppIconChange?(showAppIcon)
     }
 
     @objc private func armDiagnostics() { onArmDiagnostics?() }

@@ -46,13 +46,15 @@ public struct ResolvedLabel: Equatable, Sendable {
     public var frame: CGRect
     public var appName: String?
     public var bundleID: String?
+    public var ownerPID: Int32?
     public var title: String?
     public var confidence: Confidence
 
-    public init(frame: CGRect, appName: String?, bundleID: String? = nil, title: String?, confidence: Confidence) {
+    public init(frame: CGRect, appName: String?, bundleID: String? = nil, ownerPID: Int32? = nil, title: String?, confidence: Confidence) {
         self.frame = frame
         self.appName = appName
         self.bundleID = bundleID
+        self.ownerPID = ownerPID
         self.title = title
         self.confidence = confidence
     }

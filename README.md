@@ -25,6 +25,7 @@ Mission Control lays out every window at a glance, but you have to hover to find
 - **Title first** — Line 1 is the window title, line 2 is the app name. Windows without a title show the app name only.
 - **Choose the position** — Center, top left, top right, bottom left, or bottom right, from the menu.
 - **Choose the order** — Title / app name by default, or app name / title, from the menu.
+- **Show the app icon** — Off by default. Turn it on from the menu to show the app icon next to the app name.
 - **VS Code workspace first** — For VS Code, Cursor, Windsurf and friends, line 1 shows the workspace name and line 2 shows `file · Code`.
 - **Multiple displays** — Works on every connected screen.
 

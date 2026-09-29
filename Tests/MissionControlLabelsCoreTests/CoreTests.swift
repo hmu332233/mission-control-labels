@@ -175,6 +175,66 @@ final class LabelAnchorTests: XCTestCase {
     }
 }
 
+/// 라벨은 썸네일 밖의 빈 공간까지 쓸 수 있다. 다만 다른 썸네일 위와 화면 밖, 다른 라벨 자리로는 나가지 않는다
+final class LabelWidthPolicyTests: XCTestCase {
+    let screen = CGSize(width: 1600, height: 1000)
+    let inset: CGFloat = 8
+    let thumb = CGRect(x: 100, y: 100, width: 300, height: 200)
+
+    func limit(_ anchor: LabelAnchor, others: [CGRect] = []) -> CGFloat {
+        LabelWidthPolicy.maxWidth(thumb: thumb, others: others, screen: screen, inset: inset, anchor: anchor)
+    }
+
+    func testUsesFreeSpaceUpToTheScreenEdge() {
+        // 썸네일 폭 상한(284)으로는 긴 제목이 잘렸다. 주변이 비었으면 중앙 라벨은 왼쪽 여유(242)까지 왕복
+        XCTAssertEqual(limit(.center), 484)
+        // 왼쪽 배치는 시작점(108)에서 화면 오른쪽 여유까지
+        XCTAssertEqual(limit(.bottomLeft), 1592 - 108)
+    }
+
+    func testNeighbourInSameRowSplitsTheGap() {
+        let a = thumb
+        let b = CGRect(x: 500, y: 110, width: 300, height: 200) // 세로로 조금 어긋나도 같은 줄로 본다
+        // 빈 공간(400…500)의 정중앙 450을 경계로 삼는다
+        XCTAssertEqual(LabelWidthPolicy.maxWidths([a, b], screen: screen, inset: inset, anchor: .center), [400, 400])
+    }
+
+    func testNeighbourInAnotherRowDoesNotLimit() {
+        XCTAssertEqual(limit(.center, others: [CGRect(x: 100, y: 500, width: 300, height: 200)]), 484)
+    }
+
+    func testCornerAnchorsGrowAwayFromTheNeighbour() {
+        let b = CGRect(x: 500, y: 100, width: 300, height: 200)
+        XCTAssertEqual(limit(.topLeft, others: [b]), 450 - 108)
+        // 오른쪽 배치는 왼쪽(화면 여백) 여유만 쓴다
+        XCTAssertEqual(limit(.topRight, others: [b]), 400 - inset * 2)
+    }
+
+    func testThumbnailAtScreenEdgeKeepsTheOldLimit() {
+        let edge = CGRect(x: 0, y: 100, width: 300, height: 200)
+        XCTAssertEqual(LabelWidthPolicy.maxWidth(thumb: edge, others: [], screen: screen, inset: inset, anchor: .center),
+                       300 - inset * 2)
+    }
+
+    /// 두 라벨이 같은 빈 공간을 통째로 쓰려고 해도 경계를 반씩 나눠 겹치지 않는다
+    func testMaximalLabelsDoNotOverlapEachOther() {
+        let row = [thumb, CGRect(x: 430, y: 100, width: 300, height: 200), CGRect(x: 760, y: 100, width: 300, height: 200)]
+        let widths = LabelWidthPolicy.maxWidths(row, screen: screen, inset: inset, anchor: .center)
+        XCTAssertTrue(widths.contains { $0 > 300 }, "빈 공간을 썼는지 확인: \(widths)")
+        let height: CGFloat = 50
+        let rects = zip(row, widths).map { t, w -> CGRect in
+            CGRect(origin: LabelAnchor.center.origin(labelSize: CGSize(width: w, height: height), in: t, inset: inset),
+                   size: CGSize(width: w, height: height))
+        }
+        for (i, r) in rects.enumerated() {
+            for other in rects.dropFirst(i + 1) {
+                let inter = r.intersection(other)
+                XCTAssertTrue(inter.isNull || inter.width <= 0, "라벨이 겹침: \(r) \(other)")
+            }
+        }
+    }
+}
+
 /// 라벨 외관 옵션(아이콘 위치·배율)이 메뉴에 저장한 문자열로 되돌아오는지
 final class LabelAppearanceOptionTests: XCTestCase {
     func testScaleFactorsMatchDisplayedPercentages() {

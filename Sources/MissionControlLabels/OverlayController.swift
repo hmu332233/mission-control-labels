@@ -108,15 +108,38 @@ final class OverlayController {
         if showAppIcon { iconProvider.invalidateSessionCaches() }
         for w in windows { w.contentView?.subviews.forEach { $0.removeFromSuperview() } }
 
+        // 라벨이 놓일 썸네일(화면 로컬 좌표)과 화면 인덱스
+        struct Placement {
+            let label: ResolvedLabel
+            let screen: Int
+            let local: CGRect
+        }
+        var placements: [Placement] = []
         for label in labels {
             let thumbAppKit = geometry.appKitRect(fromTopLeft: label.frame)
             guard let idx = geometry.screenIndex(forAppKitRect: thumbAppKit), idx < windows.count else { continue }
-            let window = windows[idx]
-            let local = geometry.localRect(thumbAppKit, inScreen: geometry.screenFrames[idx])
-            let maxWidth = max(24, local.width - Self.inset * 2)
+            placements.append(Placement(label: label, screen: idx,
+                                        local: geometry.localRect(thumbAppKit, inScreen: geometry.screenFrames[idx])))
+        }
+
+        // 폭 상한은 화면 단위로 한 번에 계산한다. 라벨이 썸네일 밖의 빈 공간까지 쓸 수 있는지,
+        // 있다면 어디까지는 같은 화면의 다른 썸네일과 함께 봐야 알 수 있다
+        var maxWidths = [CGFloat](repeating: 0, count: placements.count)
+        for screen in Set(placements.map(\.screen)) {
+            let members = placements.indices.filter { placements[$0].screen == screen }
+            let rects = members.map { placements[$0].local }
+            let limits = LabelWidthPolicy.maxWidths(rects, screen: geometry.screenFrames[screen].size,
+                                                   inset: Self.inset, anchor: anchor)
+            for (i, slot) in members.enumerated() { maxWidths[slot] = limits[i] }
+        }
+
+        for (index, placement) in placements.enumerated() {
+            let window = windows[placement.screen]
+            let local = placement.local
+            let maxWidth = max(24, maxWidths[index])
             let lineLimit = LabelLayoutPolicy.titleLineLimit(forThumbnailHeight: local.height)
-            let icon = (showAppIcon ? label.ownerPID.flatMap(iconProvider.icon(for:)) : nil)
-            let view = LabelView(label: label, maxWidth: maxWidth, titleLineLimit: lineLimit,
+            let icon = (showAppIcon ? placement.label.ownerPID.flatMap(iconProvider.icon(for:)) : nil)
+            let view = LabelView(label: placement.label, maxWidth: maxWidth, titleLineLimit: lineLimit,
                                  alignment: anchor.textAlignment, order: order, icon: icon,
                                  iconLayout: iconLayout, scale: scale)
             var size = view.frame.size

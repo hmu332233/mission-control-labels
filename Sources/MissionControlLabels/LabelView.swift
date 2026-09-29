@@ -50,8 +50,8 @@ final class LabelView: NSView {
         // 아이콘을 왼쪽 칸에 두면 텍스트 칸은 좌측 정렬이 자연스럽다
         let textAlignment = Self.nsAlignment(useLeadingCell ? .left : alignment)
 
-        // 폭 상한은 썸네일(= 실창 비율)에서 나오는 값 하나뿐. 안에 별도의 상한을 두면 긴 제목이
-        // 자리가 남는데도 말줄임으로 잘렸다. 넓어질 만큼 넓히고 남는 곳에서만 줄바꿈·말줄임
+        // 폭 상한은 밖에서 주는 값 하나만 쓴다. 안에 별도 상한을 두면 자리가 남는데도 긴 제목이
+        // 말줄임으로 잘렸다. 상한은 LabelWidthPolicy가 정한 값 — 썸네일 밖의 빈 공간까지 포함
         let cardMax = maxWidth
         text = TextLayer(label: label,
                          textWidth: max(24, cardMax - style.paddingH * 2 - iconColumn),

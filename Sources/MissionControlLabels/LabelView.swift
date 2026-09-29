@@ -24,8 +24,6 @@ final class LabelView: NSView {
         var lineGap: CGFloat { 3 * scale }
         var cornerRadius: CGFloat { 14 * scale }
         var iconGap: CGFloat { 6 * scale }
-        /// 카드 최대 폭. 큰 썸네일에서도 과도한 확장 방지
-        var maxCardWidth: CGFloat { 400 * scale }
         /// 왼쪽 별도 칸 아이콘: 텍스트보다 크게, 카드 세로 중앙. 모든 라벨에서 같고, 칸 폭도 이 기준으로 고정
         var leadingIconSide: CGFloat { 44 * scale }
         /// 낮은 카드에서는 아이콘이 카드 밖으로 넘치지 않도록 이 이상으로 키우지 않는다
@@ -52,7 +50,9 @@ final class LabelView: NSView {
         // 아이콘을 왼쪽 칸에 두면 텍스트 칸은 좌측 정렬이 자연스럽다
         let textAlignment = Self.nsAlignment(useLeadingCell ? .left : alignment)
 
-        let cardMax = min(maxWidth, style.maxCardWidth)
+        // 폭 상한은 썸네일(= 실창 비율)에서 나오는 값 하나뿐. 안에 별도의 상한을 두면 긴 제목이
+        // 자리가 남는데도 말줄임으로 잘렸다. 넓어질 만큼 넓히고 남는 곳에서만 줄바꿈·말줄임
+        let cardMax = maxWidth
         text = TextLayer(label: label,
                          textWidth: max(24, cardMax - style.paddingH * 2 - iconColumn),
                          titleLineLimit: titleLineLimit,
@@ -226,8 +226,21 @@ final class LabelView: NSView {
         override var isFlipped: Bool { true }
 
         static func lineHeight(_ font: NSFont) -> CGFloat {
-            ceil(font.ascender - font.descender + font.leading)
+            if let cached = lineHeightCache[font] { return cached }
+            // ascender-descender+leading 식은 15pt에서 18pt를 주는데 실제로 한 줄은 19pt를
+            // 차지한다. 그래서 "두 줄 허용" = 36pt에 실제 두 줄이 안 들어가 긴 제목이 항상
+            // 한 줄로 잘렸다. 줄 높이는 수식으로 계산하지 않고 위아래로 튀는 문자가 있는
+            // 문자열을 재서 얻는다. LabelView는 메인 스레드에서만 만들므로 락이 필요 없다
+            let measured = ceil(("Hxpg" as NSString)
+                .boundingRect(with: NSSize(width: 1000, height: CGFloat.greatestFiniteMagnitude),
+                              options: [.usesLineFragmentOrigin],
+                              attributes: [.font: font])
+                .height)
+            lineHeightCache[font] = measured
+            return measured
         }
+
+        private static var lineHeightCache: [NSFont: CGFloat] = [:]
 
         static func attrs(_ font: NSFont, _ color: NSColor, _ alignment: NSTextAlignment = .center) -> [NSAttributedString.Key: Any] {
             let ps = NSMutableParagraphStyle()

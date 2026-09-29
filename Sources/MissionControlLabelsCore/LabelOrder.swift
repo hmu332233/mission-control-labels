@@ -10,8 +10,11 @@ public enum LabelOrder: String, CaseIterable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .titleFirst: return "제목 / 앱 이름"
-        case .appFirst: return "앱 이름 / 제목"
+        case .titleFirst: return "Title / App Name"
+        case .appFirst: return "App Name / Title"
         }
     }
+
+    /// Localizable.strings에서 메뉴 제목을 찾는 키
+    public var localizationKey: String { "order.\(rawValue)" }
 }

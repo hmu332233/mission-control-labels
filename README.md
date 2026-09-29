@@ -28,6 +28,7 @@ Mission Control lays out every window at a glance, but you have to hover to find
 - **Show the app icon** — Off by default. Turn it on from the menu to show the app icon next to the app name.
 - **VS Code workspace first** — For VS Code, Cursor, Windsurf and friends, line 1 shows the workspace name and line 2 shows `file · Code`.
 - **Multiple displays** — Works on every connected screen.
+- **Menu in your language** — English and 한국어 follow the system language; you can change it for this app under **System Settings → Language & Region**.
 
 ## Requirements
 

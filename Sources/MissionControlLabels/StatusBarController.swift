@@ -7,7 +7,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let toggleItem = NSMenuItem(title: "", action: #selector(toggle), keyEquivalent: "")
     private let permissionItem = NSMenuItem(title: "", action: #selector(openPermission), keyEquivalent: "")
     private let stateItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-    private let diagItem = NSMenuItem(title: "다음 Mission Control 진단 기록", action: #selector(armDiagnostics), keyEquivalent: "")
+    private let diagItem = NSMenuItem(title: L10n.string("menu.diagnostics.record", "Record Next Mission Control Diagnostics"), action: #selector(armDiagnostics), keyEquivalent: "")
 
     private let anchorMenu = NSMenu()
     var anchor: LabelAnchor = .default
@@ -15,7 +15,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let orderMenu = NSMenu()
     var order: LabelOrder = .default
     var onOrderChange: ((LabelOrder) -> Void)?
-    private let showAppIconItem = NSMenuItem(title: "앱 아이콘 표시", action: #selector(toggleShowAppIcon), keyEquivalent: "")
+    private let showAppIconItem = NSMenuItem(title: L10n.string("menu.icon.show", "Show App Icon"), action: #selector(toggleShowAppIcon), keyEquivalent: "")
     var showAppIcon = false
     var onShowAppIconChange: ((Bool) -> Void)?
     var isEnabled = true
@@ -39,18 +39,18 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(stateItem)
         menu.addItem(permissionItem)
         menu.addItem(.separator())
-        let anchorItem = NSMenuItem(title: "라벨 위치", action: nil, keyEquivalent: "")
+        let anchorItem = NSMenuItem(title: L10n.string("menu.label.position", "Label Position"), action: nil, keyEquivalent: "")
         for a in LabelAnchor.allCases {
-            let mi = NSMenuItem(title: a.displayName, action: #selector(selectAnchor(_:)), keyEquivalent: "")
+            let mi = NSMenuItem(title: L10n.string(a.localizationKey, a.displayName), action: #selector(selectAnchor(_:)), keyEquivalent: "")
             mi.representedObject = a.rawValue
             mi.target = self
             anchorMenu.addItem(mi)
         }
         anchorItem.submenu = anchorMenu
         menu.addItem(anchorItem)
-        let orderItem = NSMenuItem(title: "정보 순서", action: nil, keyEquivalent: "")
+        let orderItem = NSMenuItem(title: L10n.string("menu.label.order", "Info Order"), action: nil, keyEquivalent: "")
         for o in LabelOrder.allCases {
-            let mi = NSMenuItem(title: o.displayName, action: #selector(selectOrder(_:)), keyEquivalent: "")
+            let mi = NSMenuItem(title: L10n.string(o.localizationKey, o.displayName), action: #selector(selectOrder(_:)), keyEquivalent: "")
             mi.representedObject = o.rawValue
             mi.target = self
             orderMenu.addItem(mi)
@@ -60,19 +60,19 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(showAppIconItem)
         menu.addItem(.separator())
         menu.addItem(diagItem)
-        menu.addItem(withTitle: "진단 로그 폴더 열기", action: #selector(openLogs), keyEquivalent: "").target = self
+        menu.addItem(withTitle: L10n.string("menu.diagnostics.openFolder", "Open Diagnostics Log Folder"), action: #selector(openLogs), keyEquivalent: "").target = self
         menu.addItem(.separator())
-        menu.addItem(withTitle: "종료", action: #selector(quit), keyEquivalent: "q").target = self
+        menu.addItem(withTitle: L10n.string("menu.quit", "Quit"), action: #selector(quit), keyEquivalent: "q").target = self
         menu.delegate = self
         item.menu = menu
         refresh()
     }
 
     func refresh() {
-        toggleItem.title = isEnabled ? "라벨 표시 끄기" : "라벨 표시 켜기"
+        toggleItem.title = isEnabled ? L10n.string("menu.toggle.hide", "Hide Labels") : L10n.string("menu.toggle.show", "Show Labels")
         toggleItem.state = isEnabled ? .on : .off
-        permissionItem.title = isTrusted ? "손쉬운 사용 권한: 허용됨" : "손쉬운 사용 권한 필요 — 시스템 설정 열기…"
-        stateItem.title = "상태: \(stateText)"
+        permissionItem.title = isTrusted ? L10n.string("menu.permission.granted", "Accessibility Permission: Granted") : L10n.string("menu.permission.required", "Accessibility Permission Required — Open System Settings…")
+        stateItem.title = L10n.string("menu.state", "State: %@", stateText)
         for mi in anchorMenu.items { mi.state = (mi.representedObject as? String) == anchor.rawValue ? .on : .off }
         for mi in orderMenu.items { mi.state = (mi.representedObject as? String) == order.rawValue ? .on : .off }
         showAppIconItem.state = showAppIcon ? .on : .off

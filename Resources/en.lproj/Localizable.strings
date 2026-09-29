@@ -1,0 +1,37 @@
+/* 라벨 표시/숨김 메뉴 */
+"menu.toggle.hide" = "Hide Labels";
+"menu.toggle.show" = "Show Labels";
+
+/* 상태 및 권한 메뉴 */
+"menu.permission.granted" = "Accessibility Permission: Granted";
+"menu.permission.required" = "Accessibility Permission Required — Open System Settings…";
+"menu.state" = "State: %@";
+
+/* 메뉴 상위 항목 */
+"menu.diagnostics.openFolder" = "Open Diagnostics Log Folder";
+"menu.diagnostics.record" = "Record Next Mission Control Diagnostics";
+"menu.icon.show" = "Show App Icon";
+"menu.label.order" = "Info Order";
+"menu.label.position" = "Label Position";
+"menu.quit" = "Quit";
+
+/* Mission Control 상태 표시줄 */
+"state.diagnostics.armed" = "Diagnostics armed — open Mission Control";
+"state.diagnostics.failed" = "Diagnostics failed";
+"state.diagnostics.saved" = "Diagnostics saved: %@";
+"state.idle" = "Idle";
+"state.inactive" = "Inactive";
+"state.noPermission" = "No Permission";
+"state.settling" = "Waiting for layout";
+"state.showing" = "Showing";
+
+/* 라벨 위치 */
+"anchor.bottomLeft" = "Bottom Left";
+"anchor.bottomRight" = "Bottom Right";
+"anchor.center" = "Center";
+"anchor.topLeft" = "Top Left";
+"anchor.topRight" = "Top Right";
+
+/* 정보 순서 */
+"order.appFirst" = "App Name / Title";
+"order.titleFirst" = "Title / App Name";

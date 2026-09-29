@@ -17,11 +17,13 @@ BIN="$(swift build -c "$CONFIG" --show-bin-path)/${NAME}"
 rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 cp "$BIN" "$OUT/Contents/MacOS/${NAME}"
+cp -R Resources/*.lproj "$OUT/Contents/Resources/"
 
 cat > "$OUT/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleName</key><string>${NAME}</string>
   <key>CFBundleDisplayName</key><string>Mission Control Labels</string>
   <key>CFBundleIdentifier</key><string>${BUNDLE_ID}</string>

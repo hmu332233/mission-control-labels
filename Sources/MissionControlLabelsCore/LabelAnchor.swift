@@ -8,13 +8,16 @@ public enum LabelAnchor: String, CaseIterable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .center: return "중앙"
-        case .topLeft: return "왼쪽 위"
-        case .topRight: return "오른쪽 위"
-        case .bottomLeft: return "왼쪽 아래"
-        case .bottomRight: return "오른쪽 아래"
+        case .center: return "Center"
+        case .topLeft: return "Top Left"
+        case .topRight: return "Top Right"
+        case .bottomLeft: return "Bottom Left"
+        case .bottomRight: return "Bottom Right"
         }
     }
+
+    /// Localizable.strings에서 메뉴 제목을 찾는 키
+    public var localizationKey: String { "anchor.\(rawValue)" }
 
     public enum TextAlignment: Sendable { case left, center, right }
 

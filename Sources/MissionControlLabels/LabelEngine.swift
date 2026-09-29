@@ -100,10 +100,17 @@ final class LabelEngine {
             return
         }
 
-        guard let group = reader.missionControlGroup() else {
+        let groups = reader.missionControlGroups()
+        if groups.isEmpty {
             if wasOpen { log.debug("mission control closed") }
             endSessionIfOpen()
             setState(.idle)
+            // 그룹 자체를 못 찾으면 기록이 한 줄도 안 남는다. 대기 초과 시 실패 기록을 남긴다
+            if diagnostics.isArmed, diagnostics.armedSeconds > Diagnostics.notFoundTimeout {
+                diagnostics.disarm()
+                let url = diagnostics.writeNotFound(reader: reader)
+                DispatchQueue.main.async { self.onDiagnosticWritten?(url) }
+            }
             schedule(after: Self.idleInterval, generation: generation)
             return
         }
@@ -115,7 +122,14 @@ final class LabelEngine {
             log.debug("mission control opened")
         }
 
-        let snapshot = reader.thumbnails(in: group)
+        let snapshot = reader.thumbnails(in: groups)
+        // 썸네일이 0개면 안정 판정이 영원히 불가능하다. 이 상태에서 기록해 침묵하는 진단을 없앤다
+        if snapshot.isEmpty, diagnostics.isArmed {
+            diagnostics.disarm()
+            let url = diagnostics.write(reader: reader, groups: groups, thumbnails: [], outcome: nil, windows: [])
+            DispatchQueue.main.async { self.onDiagnosticWritten?(url) }
+        }
+
         let stable = LayoutStability.isStable(previousSnapshot, snapshot)
         stableCount = stable ? stableCount + 1 : 1
         previousSnapshot = snapshot
@@ -123,7 +137,7 @@ final class LabelEngine {
         if stable && stableCount >= Self.stableObservationsRequired {
             if renderedSnapshot == nil || !LayoutStability.isStable(renderedSnapshot!, snapshot) {
                 let session = currentSession
-                let outcome = resolver.resolve(snapshot, dockPID: reader.currentDockPID)
+                let outcome = resolver.resolve(snapshot, hostPIDs: reader.hostPIDs)
                 let st = outcome.stats
                 log.info("resolved thumbnails=\(st.thumbnailCount) unique=\(st.uniqueMatches) ambiguous=\(st.ambiguousMatches) unmatched=\(st.unmatched) titleFallback=\(st.titleUniqueFallbacks) elapsedMs=\(Int(st.elapsed * 1000))")
                 renderedSnapshot = snapshot
@@ -134,7 +148,7 @@ final class LabelEngine {
                 }
                 if diagnostics.isArmed {
                     diagnostics.disarm()
-                    let url = diagnostics.write(reader: reader, group: group, thumbnails: snapshot,
+                    let url = diagnostics.write(reader: reader, groups: groups, thumbnails: snapshot,
                                                 outcome: outcome, windows: resolver.lastWindows)
                     DispatchQueue.main.async { self.onDiagnosticWritten?(url) }
                 }

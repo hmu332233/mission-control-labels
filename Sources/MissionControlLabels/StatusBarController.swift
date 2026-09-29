@@ -15,6 +15,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let orderMenu = NSMenu()
     var order: LabelOrder = .default
     var onOrderChange: ((LabelOrder) -> Void)?
+    private let iconLayoutMenu = NSMenu()
+    var iconLayout: LabelIconLayout = .default
+    var onIconLayoutChange: ((LabelIconLayout) -> Void)?
+    private let scaleMenu = NSMenu()
+    var scale: LabelScale = .default
+    var onScaleChange: ((LabelScale) -> Void)?
     private let showAppIconItem = NSMenuItem(title: L10n.string("menu.icon.show", "Show App Icon"), action: #selector(toggleShowAppIcon), keyEquivalent: "")
     var showAppIcon = false
     var onShowAppIconChange: ((Bool) -> Void)?
@@ -57,6 +63,24 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
         orderItem.submenu = orderMenu
         menu.addItem(orderItem)
+        let iconLayoutItem = NSMenuItem(title: "Icon Position", action: nil, keyEquivalent: "")
+        for l in LabelIconLayout.allCases {
+            let mi = NSMenuItem(title: l.displayName, action: #selector(selectIconLayout(_:)), keyEquivalent: "")
+            mi.representedObject = l.rawValue
+            mi.target = self
+            iconLayoutMenu.addItem(mi)
+        }
+        iconLayoutItem.submenu = iconLayoutMenu
+        menu.addItem(iconLayoutItem)
+        let scaleItem = NSMenuItem(title: "Label Size", action: nil, keyEquivalent: "")
+        for s in LabelScale.allCases {
+            let mi = NSMenuItem(title: s.displayName, action: #selector(selectScale(_:)), keyEquivalent: "")
+            mi.representedObject = s.rawValue
+            mi.target = self
+            scaleMenu.addItem(mi)
+        }
+        scaleItem.submenu = scaleMenu
+        menu.addItem(scaleItem)
         menu.addItem(showAppIconItem)
         menu.addItem(.separator())
         menu.addItem(diagItem)
@@ -75,6 +99,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         stateItem.title = L10n.string("menu.state", "State: %@", stateText)
         for mi in anchorMenu.items { mi.state = (mi.representedObject as? String) == anchor.rawValue ? .on : .off }
         for mi in orderMenu.items { mi.state = (mi.representedObject as? String) == order.rawValue ? .on : .off }
+        for mi in iconLayoutMenu.items { mi.state = (mi.representedObject as? String) == iconLayout.rawValue ? .on : .off }
+        for mi in scaleMenu.items { mi.state = (mi.representedObject as? String) == scale.rawValue ? .on : .off }
         showAppIconItem.state = showAppIcon ? .on : .off
         item.button?.appearsDisabled = !(isEnabled && isTrusted)
     }
@@ -111,6 +137,25 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         showAppIcon.toggle()
         refresh()
         onShowAppIconChange?(showAppIcon)
+    }
+
+    @objc private func selectIconLayout(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let l = LabelIconLayout(rawValue: raw) else { return }
+        iconLayout = l
+        // 아이콘 위치를 고른 건 아이콘을 보겠다는 뜻이므로 켜져 있지 않으면 켠다
+        if !showAppIcon {
+            showAppIcon = true
+            onShowAppIconChange?(true)
+        }
+        refresh()
+        onIconLayoutChange?(l)
+    }
+
+    @objc private func selectScale(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let s = LabelScale(rawValue: raw) else { return }
+        scale = s
+        refresh()
+        onScaleChange?(s)
     }
 
     @objc private func armDiagnostics() { onArmDiagnostics?() }

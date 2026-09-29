@@ -174,3 +174,22 @@ final class LabelAnchorTests: XCTestCase {
         }
     }
 }
+
+/// 라벨 외관 옵션(아이콘 위치·배율)이 메뉴에 저장한 문자열로 되돌아오는지
+final class LabelAppearanceOptionTests: XCTestCase {
+    func testScaleFactorsMatchDisplayedPercentages() {
+        XCTAssertEqual(LabelScale.hundred.factor, 1)
+        XCTAssertEqual(LabelScale.oneTwentyFive.factor, 1.25)
+        XCTAssertEqual(LabelScale.oneFifty.factor, 1.5)
+        XCTAssertEqual(LabelScale.default, .hundred)
+        // 메뉴는 배율을 "125%" 같은 문자열로 저장하므로 그대로 되돌아와야 한다
+        for scale in LabelScale.allCases { XCTAssertEqual(LabelScale(rawValue: scale.rawValue), scale) }
+        XCTAssertNil(LabelScale(rawValue: "200%"))
+    }
+
+    func testIconLayoutRoundTripAndDefault() {
+        XCTAssertEqual(LabelIconLayout.default, .inLine)
+        for layout in LabelIconLayout.allCases { XCTAssertEqual(LabelIconLayout(rawValue: layout.rawValue), layout) }
+        XCTAssertNil(LabelIconLayout(rawValue: "top"))
+    }
+}

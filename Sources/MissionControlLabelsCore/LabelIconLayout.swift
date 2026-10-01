@@ -15,4 +15,7 @@ public enum LabelIconLayout: String, CaseIterable, Sendable {
         case .leading: return "Left of Text"
         }
     }
+
+    /// Localizable.strings에서 메뉴 제목을 찾는 키
+    public var localizationKey: String { "iconLayout.\(rawValue)" }
 }

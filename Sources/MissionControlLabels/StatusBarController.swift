@@ -63,17 +63,18 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
         orderItem.submenu = orderMenu
         menu.addItem(orderItem)
-        let iconLayoutItem = NSMenuItem(title: "Icon Position", action: nil, keyEquivalent: "")
+        let iconLayoutItem = NSMenuItem(title: L10n.string("menu.icon.position", "Icon Position"), action: nil, keyEquivalent: "")
         for l in LabelIconLayout.allCases {
-            let mi = NSMenuItem(title: l.displayName, action: #selector(selectIconLayout(_:)), keyEquivalent: "")
+            let mi = NSMenuItem(title: L10n.string(l.localizationKey, l.displayName), action: #selector(selectIconLayout(_:)), keyEquivalent: "")
             mi.representedObject = l.rawValue
             mi.target = self
             iconLayoutMenu.addItem(mi)
         }
         iconLayoutItem.submenu = iconLayoutMenu
         menu.addItem(iconLayoutItem)
-        let scaleItem = NSMenuItem(title: "Label Size", action: nil, keyEquivalent: "")
+        let scaleItem = NSMenuItem(title: L10n.string("menu.label.size", "Label Size"), action: nil, keyEquivalent: "")
         for s in LabelScale.allCases {
+            // 배율 항목은 "100%" 같은 숫자라 번역이 필요 없다
             let mi = NSMenuItem(title: s.displayName, action: #selector(selectScale(_:)), keyEquivalent: "")
             mi.representedObject = s.rawValue
             mi.target = self

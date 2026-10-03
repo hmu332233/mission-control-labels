@@ -63,6 +63,20 @@ final class MatcherTests: XCTestCase {
         let wins = [w(1, 10, 100, 100, 400, 300)]
         XCTAssertEqual(m.match(CGRect(x: 100, y: 100, width: 420, height: 300), in: wins), .none)
     }
+
+    /// macOS 27: 미리보기이 카드 테두리 안쪽에 그려 실창보다 각 변에서 6~14pt 작다. 실측 값
+    func testCardInsetThumbnailMatches() {
+        let m = GeometryMatcher()
+        let wins = [w(1, 10, 471, 110, 527, 331)]
+        XCTAssertEqual(m.match(CGRect(x: 477, y: 111, width: 509, height: 319), in: wins), .unique(wins[0]))
+    }
+
+    /// 미리보기이가 너무 작아진 경우(다른 화면 축소 배율 등)는 대응시키지 않는다
+    func testCardInsetTooSmallIsRejected() {
+        let m = GeometryMatcher()
+        let wins = [w(1, 10, 471, 110, 527, 331)]
+        XCTAssertEqual(m.match(CGRect(x: 490, y: 120, width: 420, height: 260), in: wins), .none)
+    }
 }
 
 final class TitleMatcherTests: XCTestCase {

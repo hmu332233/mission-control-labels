@@ -4,13 +4,16 @@ import CoreGraphics
 /// 썸네일 좌표와 CG 창 좌표 대응. 모호 시 대응 거부
 public struct GeometryMatcher: Sendable {
     public struct Config: Sendable {
-        /// 중심점 거리 허용 오차(pt)
+        /// 중심점 거리 허용 오차(pt). macOS 27은 미리보기을 카드 테두리 안쪽에 그려 실창 중심과 수십 pt 어긋난다
         public var centerTolerance: CGFloat
-        /// 폭·높이 각각의 허용 오차(pt)
-        public var sizeTolerance: CGFloat
-        public init(centerTolerance: CGFloat = 4, sizeTolerance: CGFloat = 4) {
+        /// 미리보기이 실창보다 클 수 있는 범위(pt). 크게 어긋나면 다른 창으로 오판정
+        public var thumbOversizeTolerance: CGFloat
+        /// 실창이 미리보기이보다 클 수 있는 범위(pt). 카드 테두리·그림자 두께
+        public var windowOversizeTolerance: CGFloat
+        public init(centerTolerance: CGFloat = 24, thumbOversizeTolerance: CGFloat = 6, windowOversizeTolerance: CGFloat = 40) {
             self.centerTolerance = centerTolerance
-            self.sizeTolerance = sizeTolerance
+            self.thumbOversizeTolerance = thumbOversizeTolerance
+            self.windowOversizeTolerance = windowOversizeTolerance
         }
     }
 
@@ -29,8 +32,10 @@ public struct GeometryMatcher: Sendable {
             let f = w.frame
             let dx = abs(f.midX - thumb.midX), dy = abs(f.midY - thumb.midY)
             return hypot(dx, dy) <= config.centerTolerance
-                && abs(f.width - thumb.width) <= config.sizeTolerance
-                && abs(f.height - thumb.height) <= config.sizeTolerance
+                && thumb.width - f.width <= config.thumbOversizeTolerance
+                && thumb.height - f.height <= config.thumbOversizeTolerance
+                && f.width - thumb.width <= config.windowOversizeTolerance
+                && f.height - thumb.height <= config.windowOversizeTolerance
         }
     }
 

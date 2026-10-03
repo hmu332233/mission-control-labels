@@ -1,0 +1,37 @@
+/* 라벨 표시/숨김 메뉴 */
+"menu.toggle.hide" = "라벨 표시 끄기";
+"menu.toggle.show" = "라벨 표시 켜기";
+
+/* 상태 및 권한 메뉴 */
+"menu.permission.granted" = "손쉬운 사용 권한: 허용됨";
+"menu.permission.required" = "손쉬운 사용 권한 필요 — 시스템 설정 열기…";
+"menu.state" = "상태: %@";
+
+/* 메뉴 상위 항목 */
+"menu.diagnostics.openFolder" = "진단 로그 폴더 열기";
+"menu.diagnostics.record" = "다음 Mission Control 진단 기록";
+"menu.icon.show" = "앱 아이콘 표시";
+"menu.label.order" = "정보 순서";
+"menu.label.position" = "라벨 위치";
+"menu.quit" = "종료";
+
+/* Mission Control 상태 표시줄 */
+"state.diagnostics.armed" = "진단 대기 중 — Mission Control을 열어 주세요";
+"state.diagnostics.failed" = "진단 기록 실패";
+"state.diagnostics.saved" = "진단 기록 저장: %@";
+"state.idle" = "대기";
+"state.inactive" = "비활성";
+"state.noPermission" = "권한 없음";
+"state.settling" = "배치 대기";
+"state.showing" = "표시 중";
+
+/* 라벨 위치 */
+"anchor.bottomLeft" = "왼쪽 아래";
+"anchor.bottomRight" = "오른쪽 아래";
+"anchor.center" = "중앙";
+"anchor.topLeft" = "왼쪽 위";
+"anchor.topRight" = "오른쪽 위";
+
+/* 정보 순서 */
+"order.appFirst" = "앱 이름 / 제목";
+"order.titleFirst" = "제목 / 앱 이름";

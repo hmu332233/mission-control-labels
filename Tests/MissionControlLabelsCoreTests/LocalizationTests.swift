@@ -4,7 +4,7 @@ import XCTest
 /// `Resources/<lang>.lproj/Localizable.strings` 표가 코드와 어긋나지 않았는지 검증한다.
 final class LocalizationTests: XCTestCase {
     /// 코드 기본값과 표가 맞아야 하는 키의 개수
-    static let expectedKeyCount = 26
+    static let expectedKeyCount = 30
 
     /// 이 파일에서 패키지 루트까지 (Tests/<타깃>/파일 → Tests → 루트)
     private static let packageRoot = URL(fileURLWithPath: #filePath)
@@ -58,5 +58,26 @@ final class LocalizationTests: XCTestCase {
             XCTAssertTrue(en[key]?.contains("%@") ?? false, "en: \(key)에 %@가 없음")
             XCTAssertTrue(ko[key]?.contains("%@") ?? false, "ko: \(key)에 %@가 없음")
         }
+    }
+
+    /// 나열형 메뉴 항목을 추가하면 두 표에 키가 있는지 확인한다. 새 case를 넣고 표를 빼먹는 실수를 막는다.
+    func testEveryEnumMenuItemHasAKeyInBothTables() throws {
+        let en = try table("en")
+        let ko = try table("ko")
+        let keys = LabelAnchor.allCases.map(\.localizationKey)
+            + LabelOrder.allCases.map(\.localizationKey)
+            + LabelIconLayout.allCases.map(\.localizationKey)
+        for key in keys {
+            XCTAssertNotNil(en[key], "en: \(key)에 키가 없음")
+            XCTAssertNotNil(ko[key], "ko: \(key)에 키가 없음")
+        }
+    }
+
+    /// 표의 영어 기본값이 코드와 같은지 나열형 항목 전체에 대해 확인한다.
+    func testEnumDisplayNamesMatchEnglishTable() throws {
+        let en = try table("en")
+        for item in LabelAnchor.allCases { XCTAssertEqual(en[item.localizationKey], item.displayName) }
+        for item in LabelOrder.allCases { XCTAssertEqual(en[item.localizationKey], item.displayName) }
+        for item in LabelIconLayout.allCases { XCTAssertEqual(en[item.localizationKey], item.displayName) }
     }
 }

@@ -77,11 +77,11 @@ final class WindowResolver {
         var detail: [(thumbnail: Thumbnail, result: GeometryMatcher.Result, label: ResolvedLabel)]
     }
 
-    func resolve(_ thumbnails: [Thumbnail], dockPID: pid_t?) -> Outcome {
+    func resolve(_ thumbnails: [Thumbnail], hostPIDs: Set<pid_t>) -> Outcome {
         let start = Date()
         var stats = ResolveStats()
         stats.thumbnailCount = thumbnails.count
-        let windows = collectWindows(extraExcluded: dockPID.map { [$0] } ?? [])
+        let windows = collectWindows(extraExcluded: hostPIDs)
         stats.candidateWindowCount = windows.count
 
         var labels: [ResolvedLabel] = []

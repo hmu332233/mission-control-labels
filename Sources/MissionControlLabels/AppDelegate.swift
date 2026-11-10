@@ -21,6 +21,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusBar.onOrderChange = { [weak self] o in self?.overlay.order = o }
         statusBar.showAppIcon = overlay.showAppIcon
         statusBar.onShowAppIconChange = { [weak self] on in self?.overlay.showAppIcon = on }
+        statusBar.iconLayout = overlay.iconLayout
+        statusBar.onIconLayoutChange = { [weak self] l in self?.overlay.iconLayout = l }
+        statusBar.scale = overlay.scale
+        statusBar.onScaleChange = { [weak self] s in self?.overlay.scale = s }
         statusBar.onToggle = { [weak self] on in on ? self?.engine.start() : self?.engine.stop() }
         statusBar.onArmDiagnostics = { [weak self] in
             self?.engine.diagnostics.arm()

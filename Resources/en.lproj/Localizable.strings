@@ -10,9 +10,11 @@
 /* 메뉴 상위 항목 */
 "menu.diagnostics.openFolder" = "Open Diagnostics Log Folder";
 "menu.diagnostics.record" = "Record Next Mission Control Diagnostics";
+"menu.icon.position" = "Icon Position";
 "menu.icon.show" = "Show App Icon";
 "menu.label.order" = "Info Order";
 "menu.label.position" = "Label Position";
+"menu.label.size" = "Label Size";
 "menu.quit" = "Quit";
 
 /* Mission Control 상태 표시줄 */
@@ -31,6 +33,10 @@
 "anchor.center" = "Center";
 "anchor.topLeft" = "Top Left";
 "anchor.topRight" = "Top Right";
+
+/* 아이콘 위치 */
+"iconLayout.inLine" = "In Line";
+"iconLayout.leading" = "Left of Text";
 
 /* 정보 순서 */
 "order.appFirst" = "App Name / Title";
